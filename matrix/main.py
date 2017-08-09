@@ -27,30 +27,33 @@ if __name__ == "__main__":
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
     k_number = 10
     w = 1
+    combin_number = 2
     b = np.random.uniform(0, w)
     test_lsh_index = LSH.lsh_bucket(user_style_matrix, k_number, w, b)
     lsh_split = LSH.lsh_bucket_split(test_lsh_index)
     print(lsh_split)
     # print(test_lsh_index)
     re_test_matrix = LSH.rebuild_matrix(user_rank_matrix, test_lsh_index)
-
-    loc = lsh_split.astype(np.int)
-    for i in range(len(lsh_split)):
-        if loc[i,1] == loc[i,2]:
-            R = re_test_matrix[loc[i,1],:]
-            result = np.ones((1,len(R))) * 2
-        else:
-            R = re_test_matrix[loc[i,1]:(loc[i,2]+1),:]
-            N = len(R)
-            M = len(R[0])
-            K = 2
-            P = np.random.rand(N,K)
-            Q = np.random.rand(M,K)
-            nP, nQ = SGD.SGD(R, P, Q, K)
-            result = np.dot(nP,nQ.T)
+    combin_split = LSH.combine_lsh_bucket(lsh_split, combin_number)
+    print(combin_split)
+    loc = combin_split.astype(np.int)
+    for i in range(len(combin_split)):
+        # if loc[i,1] == loc[i,2]:
+        #     R = re_test_matrix[loc[i,1],:]
+        #     result = np.ones((1,len(R))) * 2
+        # else:
+        R = re_test_matrix[loc[i,1]:(loc[i,2]+1),:]
+        N = len(R)
+        M = len(R[0])
+        K = 15
+        P = np.random.rand(N,K)
+        Q = np.random.rand(M,K)
+        nP, nQ = SGD.SGD(R, P, Q, K)
+        result = np.dot(nP,nQ.T)
         if i == 0:
             final_matrix_temp = result
         else:
+
             final_matrix_temp = np.vstack((final_matrix_temp,result))
         print("times:%d"%i)
     # print(lsh_split)
@@ -60,15 +63,15 @@ if __name__ == "__main__":
     # print(final_matrix)
 
     # 直接用SGD方法
-    N = len(user_rank_matrix)
-    M = len(user_rank_matrix[0])
-    K = 2
-    P = np.random.rand(N, K)
-    Q = np.random.rand(M, K)
-    nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K)
-    direct_sgd_mc = np.dot(nP, nQ.T)
+    # N = len(user_rank_matrix)
+    # M = len(user_rank_matrix[0])
+    # K = 10
+    # P = np.random.rand(N, K)
+    # Q = np.random.rand(M, K)
+    # nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K)
+    # direct_sgd_mc = np.dot(nP, nQ.T)
     ## 评价
     lsh_test_error = EVA.test_error(final_matrix,user_test_rank_matrix)
-    direct_test_error = EVA.test_error(direct_sgd_mc,user_test_rank_matrix)
+    # direct_test_error = EVA.test_error(direct_sgd_mc,user_test_rank_matrix)
     print("lsh:%f\n"%lsh_test_error)
-    print("sgd:%f\n"%direct_test_error)
+    # print("sgd:%f\n"%direct_test_error)

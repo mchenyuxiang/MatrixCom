@@ -83,6 +83,16 @@ def lsh_bucket_split(lsh_index):
                 lsh_matrix_split = np.row_stack((lsh_matrix_split, temp_split))
     return lsh_matrix_split
 
+def combine_lsh_bucket(lsh_matrix_split,number):
+    row_number = len(lsh_matrix_split)
+    combine_lsh = np.zeros((row_number-number+1,3))
+    for i in range(row_number-number+1):
+        combine_lsh[i,0]=i
+        combine_lsh[i,1]=lsh_matrix_split[i,1]
+        combine_lsh[i,2]=lsh_matrix_split[i+number-1,2]
+    return combine_lsh
+
+
 ## 还原矩阵
 def restore_matrix(matrix,lsh_index):
     final_matrix = np.zeros((matrix.shape[0],matrix.shape[1]))
