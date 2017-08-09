@@ -20,15 +20,15 @@ def lsh_bucket(matrix,k_number,w,b):
         temp_sum = 0
         temp_sum_ori = 0
         for j in range(k_number):
-            temp_sum = temp_sum +  int((np.dot(matrix[i],a[j]) + b)/w)
-            temp_sum_ori = temp_sum_ori + (np.dot(matrix[i],a[j]) + b)/w
-        temp_sum = temp_sum / k_number
-        temp_sum_ori = temp_sum_ori / k_number
+            temp_sum = temp_sum +  (np.dot(matrix[i],a[j]) + b)
+            temp_sum_ori = temp_sum_ori + (np.dot(matrix[i],a[j]) + b)
+        temp_sum = int((temp_sum / k_number) / w)
+        temp_sum_ori = (temp_sum_ori / k_number) / w
         lsh_index[i,0] = temp_sum
         lsh_index[i,1] = temp_sum_ori
         lsh_index[i,2] = i
 
-    lsh_index_arg = np.argsort(lsh_index[:,0]) #按照桶号从下到大排序
+    lsh_index_arg = np.argsort(lsh_index[:,1]) #按照桶号从下到大排序
     lsh_index = lsh_index[lsh_index_arg]
     return lsh_index
 
@@ -83,10 +83,18 @@ def lsh_bucket_split(lsh_index):
                 lsh_matrix_split = np.row_stack((lsh_matrix_split, temp_split))
     return lsh_matrix_split
 
-
+## 还原矩阵
+def restore_matrix(matrix,lsh_index):
+    final_matrix = np.zeros((matrix.shape[0],matrix.shape[1]))
+    row_index = lsh_index.shape[0]
+    loc = lsh_index.astype(np.int)[:,2]
+    for i in range(row_index):
+        final_matrix[loc[i]] = matrix[i]
+    return final_matrix
+    pass
 
 if __name__ ==  "__main__":
-    test_matrix = np.array([(1,2,3,4),(1,1,1,1),(1,1,1,1),(1,2,3,4),(3,4,5,6),(5,6,7,8),(3,4,5,6),(5,6,7,8)])
+    test_matrix = np.array([(1,2,3,4),(1,1,1,1),(1,1,1,1),(1,2,3,5),(3,4,5,6),(5,6,7,8),(3,4,5,6),(5,6,7,8)])
     k_number = 10
     w = 1
     b = np.random.uniform(0,w)
@@ -97,3 +105,5 @@ if __name__ ==  "__main__":
     # print(test_lsh_index.shape[0])
     lsh_split = lsh_bucket_split(test_lsh_index)
     print(lsh_split)
+    final_matrix = restore_matrix(re_test_matrix,test_lsh_index)
+    print(final_matrix)

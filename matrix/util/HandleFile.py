@@ -45,8 +45,10 @@ def create_user_style_matrix(file_url,item_matrix,line_size,col_size,split_symbo
         temp_line = line.split(split_symbol)
         rate_matrix[int(temp_line[0])-1] = rate_matrix[int(temp_line[0])-1] + item_matrix[int(temp_line[1])-1]*float(temp_line[2])
         number_matrix[int(temp_line[0])-1] = number_matrix[int(temp_line[0])-1] + item_matrix[int(temp_line[1])-1]
+    number_matrix[number_matrix==0]=1
     rate_matrix = rate_matrix / number_matrix
-    print(rate_matrix[0])
+    return rate_matrix
+    # print(rate_matrix[0])
 
 if __name__ == "__main__":
     file_url = '../dataset/ml-100k/ua.base'
