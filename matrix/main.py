@@ -19,7 +19,7 @@ if __name__ == "__main__":
     style_size = 19
 
     ## 建立用户兴趣归一矩阵
-    user_test_rank_matrix = HF.create_matrix(test_url,user_size,item_size,"\t")
+    user_test_rank_matrix = HF.create_matrix(test_url, user_size, item_size, "\t")
     user_rank_matrix = HF.create_matrix(file_url, user_size, item_size, "\t")
     item_style_matrix = HF.create_file_style_matrix(item_url, item_size, style_size, "|")
     user_style_matrix = HF.create_user_style_matrix(file_url, item_style_matrix, user_size, style_size, "\t")
@@ -42,20 +42,27 @@ if __name__ == "__main__":
         #     R = re_test_matrix[loc[i,1],:]
         #     result = np.ones((1,len(R))) * 2
         # else:
-        R = re_test_matrix[loc[i,1]:(loc[i,2]+1),:]
+        R = re_test_matrix[loc[i, 1]:(loc[i, 2] + 1), :]
         N = len(R)
         M = len(R[0])
         K = 15
-        P = np.random.rand(N,K)
-        Q = np.random.rand(M,K)
+        P = np.random.rand(N, K)
+        Q = np.random.rand(M, K)
         nP, nQ = SGD.SGD(R, P, Q, K)
-        result = np.dot(nP,nQ.T)
+        result = np.dot(nP, nQ.T)
         if i == 0:
             final_matrix_temp = result
         else:
-
-            final_matrix_temp = np.vstack((final_matrix_temp,result))
-        print("times:%d"%i)
+            last_center = (lsh_split[i - 1, 0] + w * combin_number) / 2  # 上一轮中心点
+            this_center = (lsh_split[i, 0] + w * combin_number) / 2  # 本轮中心点
+            distance_split_matrix = test_lsh_index[lsh_split.astype(np.int)[i,1]:(lsh_split.astype(np.int)[i+combin_number-1,2]),:] # 提取重复计算行数
+            last_distance = distance_split_matrix[:,1]-last_center
+            this_distance = distance_split_matrix[:,1]-this_center
+            last_result = final_matrix_temp[lsh_split.astype(np.int)[i,1]:(lsh_split.astype(np.int)[i+combin_number-1,2]),:] # 上一轮计算出的结果
+            this_result = result[0:(lsh_split.astype(np.int)[i+combin_number-1,2]-lsh_split.astype(np.int)[i,1]+1),:] # 本轮计算结果
+            new_result = last_result*(last_distance/(last_distance+this_distance))+this_result*(this_distance/(last_distance+this_distance))
+            final_matrix_temp = np.vstack((final_matrix_temp, new_result))
+        print("times:%d" % i)
     # print(lsh_split)
     # print(re_test_matrix)
     # print(test_lsh_index.shape[0])
@@ -71,7 +78,7 @@ if __name__ == "__main__":
     # nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K)
     # direct_sgd_mc = np.dot(nP, nQ.T)
     ## 评价
-    lsh_test_error = EVA.test_error(final_matrix,user_test_rank_matrix)
+    lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
     # direct_test_error = EVA.test_error(direct_sgd_mc,user_test_rank_matrix)
-    print("lsh:%f\n"%lsh_test_error)
+    print("lsh:%f\n" % lsh_test_error)
     # print("sgd:%f\n"%direct_test_error)
