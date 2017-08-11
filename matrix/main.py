@@ -26,8 +26,8 @@ if __name__ == "__main__":
 
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
     k_number = 10
-    w = 1
-    combin_number = 4
+    w = 2
+    combin_number = 2
     b = np.random.uniform(0, w)
     test_lsh_index = LSH.lsh_bucket(user_style_matrix, k_number, w, b)
     lsh_split = LSH.lsh_bucket_split(test_lsh_index)
@@ -89,15 +89,15 @@ if __name__ == "__main__":
     # print(final_matrix)
 
     # 直接用SGD方法
-    # N = len(user_rank_matrix)
-    # M = len(user_rank_matrix[0])
-    # K = 10
-    # P = np.random.rand(N, K)
-    # Q = np.random.rand(M, K)
-    # nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K)
-    # direct_sgd_mc = np.dot(nP, nQ.T)
+    N = len(user_rank_matrix)
+    M = len(user_rank_matrix[0])
+    K = 10
+    P = np.random.rand(N, K)
+    Q = np.random.rand(M, K)
+    nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K)
+    direct_sgd_mc = np.dot(nP, nQ.T)
     ## 评价
     lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
-    # direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
+    direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
     print("lsh:%f\n" % lsh_test_error)
-    # print("sgd:%f\n" % direct_test_error)
+    print("sgd:%f\n" % direct_test_error)
