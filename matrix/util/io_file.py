@@ -12,6 +12,6 @@ from scipy import io
 
 def save_mat(file_url,save_url,extra_name):
     mat = io.loadmat(file_url)
-    mat_t = np.transpost(mat[extra_name])
+    mat_t = np.transpose(mat[extra_name])
     save_name = save_url+"/"+extra_name+".npy"
     np.save(save_name,mat_t)
