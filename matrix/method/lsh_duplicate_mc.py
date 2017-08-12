@@ -37,7 +37,7 @@ def lsh_mc(user_rank_matrix,user_style_matrix,opts):
         K = opts['rank']
         P = np.random.rand(N, K)
         Q = np.random.rand(M, K)
-        nP, nQ = SGD.SGD(R, P, Q, K)
+        nP, nQ = SGD.SGD(R, P, Q, K,opts['step'],opts['alpha'],opts['beta'])
         result = np.dot(nP, nQ.T)
         if i == 0:
             final_matrix_temp = result
