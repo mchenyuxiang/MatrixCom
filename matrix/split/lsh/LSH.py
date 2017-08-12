@@ -92,6 +92,26 @@ def combine_lsh_bucket(lsh_matrix_split,number):
         combine_lsh[i,2]=lsh_matrix_split[i+number-1,2]
     return combine_lsh
 
+## 根据split_number数量均分桶，再在两端加入number个桶
+def split_lsh_bucket(lsh_matrix_split,number,split_number):
+    row_number = len(lsh_matrix_split)
+    split_lsh = np.zeros((split_number,3))
+    k = row_number / split_number
+    for i in range(split_number):
+        if i == 0:
+            split_lsh[i,0] = i
+            split_lsh[i,1] = lsh_matrix_split[i,1]
+            split_lsh[i,2] = lsh_matrix_split[int(np.ceil((i+1)*k)+number-1),2]
+        elif i == (split_number-1):
+            split_lsh[i,0] = i
+            split_lsh[i,1] = lsh_matrix_split[int(np.floor(i*k)-number+1),1]
+            split_lsh[i,2] = lsh_matrix_split[row_number-1,2]
+        else:
+            split_lsh[i,0] = i
+            split_lsh[i,1] = lsh_matrix_split[int(np.floor(i*k)-number+1),1]
+            split_lsh[i,2] = lsh_matrix_split[int(np.ceil((i+1)*k)+number-1),2]
+    return split_lsh
+
 
 ## 还原矩阵
 def restore_matrix(matrix,lsh_index):
