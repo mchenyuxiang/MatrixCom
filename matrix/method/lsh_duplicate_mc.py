@@ -34,7 +34,7 @@ def lsh_mc(user_rank_matrix,user_style_matrix,opts):
         R = re_test_matrix[loc[i, 1]:(loc[i, 2] + 1), :]
         N = len(R)
         M = len(R[0])
-        K = 10
+        K = opts['rank']
         P = np.random.rand(N, K)
         Q = np.random.rand(M, K)
         nP, nQ = SGD.SGD(R, P, Q, K)
