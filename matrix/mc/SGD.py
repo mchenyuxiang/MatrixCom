@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import numpy
+from numba import jit
 
+@jit
 def SGD(R, P, Q, K, steps=100, alpha=0.0002, beta=0.02):
     Q = Q.T
     for step in range(steps):

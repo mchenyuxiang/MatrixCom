@@ -24,10 +24,11 @@ def line_sample_squence(matrix):
 def line_sample_matrix(matrix,sample_squence,rate):
     row_number = matrix.shape[0]
     col_number = matrix.shape[1]
-    sample_number = np.floor(col_number * rate)
+    sample_number = int(np.floor(col_number * rate))
     sample_matrix = np.zeros(matrix.shape)
+    sample_squence_loc = sample_squence.astype(np.int)
     for i in range(row_number):
-        sample_loc = sample_squence.astype(np.int)[i,0:int(sample_number)]
+        sample_loc = sample_squence_loc[i,0:sample_number]
         sample_matrix[i,sample_loc] = matrix[i,sample_loc]
     return sample_matrix
 
