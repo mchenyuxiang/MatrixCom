@@ -6,6 +6,7 @@ from numba import jit
 @jit
 def SGD(R, P, Q, K, steps=100, alpha=0.0002, beta=0.02):
     Q = Q.T
+    e_old = 100
     for step in range(steps):
         for i in range(len(R)):
             for j in range(len(R[i])):
@@ -24,6 +25,11 @@ def SGD(R, P, Q, K, steps=100, alpha=0.0002, beta=0.02):
                         e = e + (beta/2) * ( pow(P[i][k],2) + pow(Q[k][j],2) )
         if e < 0.001:
             break
+        if numpy.abs(e-e_old) < 0.001:
+            break
+        if (e_old - e) > 0:
+            break
+        e_old = e
     return P, Q.T
 
 if __name__ == "__main__":
