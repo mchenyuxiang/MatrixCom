@@ -10,12 +10,12 @@
 import numpy as np
 import matrix.mc.SGD as SGD
 
-def sgd_test(user_rank_matrix,opts):
-    N = len(user_rank_matrix)
-    M = len(user_rank_matrix[0])
+def sgd_test(user_rank_matrix,P,Q,opts):
+    # N = len(user_rank_matrix)
+    # M = len(user_rank_matrix[0])
     K = opts['rank']
-    P = np.random.rand(N, K)
-    Q = np.random.rand(M, K)
+    # P = np.random.rand(N, K)
+    # Q = np.random.rand(M, K)
     nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K,opts['step'],opts['alpha'],opts['beta'])
     direct_sgd_mc = np.dot(nP, nQ.T)
     return direct_sgd_mc
