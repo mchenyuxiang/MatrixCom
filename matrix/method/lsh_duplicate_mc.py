@@ -11,7 +11,7 @@ import numpy as np
 import matrix.split.lsh.LSH as LSH
 import matrix.mc.SGD as SGD
 
-def lsh_mc(user_rank_matrix,user_style_matrix,opts):
+def lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts):
     # k_number = 10
     # w = 0.9
     # combin_number = 2
@@ -22,6 +22,7 @@ def lsh_mc(user_rank_matrix,user_style_matrix,opts):
     print(lsh_split)
     # print(test_lsh_index)
     re_test_matrix = LSH.rebuild_matrix(user_rank_matrix, test_lsh_index)
+    re_P = LSH.rebuild_matrix(P,test_lsh_index)
     # combin_split = LSH.combine_lsh_bucket(lsh_split, combin_number)
     split_number_lsh = LSH.split_lsh_bucket(lsh_split, opts['combin_number'], opts['split_number'])
     print(split_number_lsh)
@@ -32,12 +33,12 @@ def lsh_mc(user_rank_matrix,user_style_matrix,opts):
         #     result = np.ones((1,len(R))) * 2
         # else:
         R = re_test_matrix[loc[i, 1]:(loc[i, 2] + 1), :]
-        N = len(R)
-        M = len(R[0])
+        # N = len(R)
+        # M = len(R[0])
         K = opts['rank']
-        P = np.random.rand(N, K)
-        Q = np.random.rand(M, K)
-        nP, nQ = SGD.SGD(R, P, Q, K,opts['step'],opts['alpha'],opts['beta'])
+        P_lsh = re_P[loc[i, 1]:(loc[i, 2] + 1), :]
+        # Q = np.random.rand(M, K)
+        nP, nQ = SGD.SGD(R, P_lsh, Q, K,opts['step'],opts['alpha'],opts['beta'])
         result = np.dot(nP, nQ.T)
         if i == 0:
             final_matrix_temp = result
