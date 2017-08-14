@@ -17,7 +17,9 @@ def test_error(computer_matrix,test_matrix):
     test_location[idx] = 1
     # print(test_location)
     compare_matrix = computer_matrix * test_location
-    test_error_f = LA.norm((compare_matrix-test_matrix),'fro')/LA.norm(test_matrix,'fro')
+    # test_error_f = LA.norm((compare_matrix-test_matrix),'fro')/LA.norm(test_matrix,'fro')
+    test_error_f = np.sqrt(np.sum(np.square(compare_matrix-test_matrix)))/np.sqrt(np.sum(np.square(test_matrix)))
+    # test_error_f = LA.norm((compare_matrix-test_matrix),'fro')/np.sum(test_location)
     return test_error_f
     pass
 
