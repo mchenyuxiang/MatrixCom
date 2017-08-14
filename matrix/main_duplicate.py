@@ -19,11 +19,11 @@ if __name__ == "__main__":
         'w':0.0001,                          # 桶宽
         'combin_number':2,              # 联合桶个数
         'split_number':4,               # 分块个数
-        'b':np.random.uniform(0,1),         # 局部敏感哈希函数中b
-        'rank':5,                      # 预估的矩阵的秩
-        'alpha':0.02,                 # sgd 参数
+        'b':np.random.uniform(0,0.0001),         # 局部敏感哈希函数中b
+        'rank':20,                      # 预估的矩阵的秩
+        'alpha':0.03,                 # sgd 参数
         'beta':0.02,                    # sgd 参数
-        'step':100,                       # 循环计算次数
+        'step':300,                       # 循环计算次数
         'rate':0.5,                     # 采样率
     }
 
@@ -54,6 +54,14 @@ if __name__ == "__main__":
     user_test_rank_matrix = user_ori_matrix - user_rank_matrix # 生成验证结果矩阵
     # print(c)
 
+
+    # 生成sgd的因子矩阵
+    N = len(user_rank_matrix)
+    M = len(user_rank_matrix[0])
+    K = opts['rank']
+    P = np.random.rand(N, K)
+    Q = np.random.rand(M, K)
+
     ## 测试数据集
     # test_a = np.random.rand(1000,opts['rank'])
     # test_b = np.random.rand(800,opts['rank'])
@@ -67,11 +75,11 @@ if __name__ == "__main__":
     # user_test_rank_matrix = user_ori_matrix - user_rank_matrix # 生成验证结果矩阵
 
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
-    final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix,user_style_matrix,opts)
+    final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts)
     # print(final_matrix)
 
     # 直接用SGD方法
-    direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,opts)
+    direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,P,Q,opts)
     ## 评价
     lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
     direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
