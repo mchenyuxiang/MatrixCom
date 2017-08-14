@@ -12,6 +12,10 @@ import numpy as np
 def lsh_bucket(matrix,k_number,w,b):
     col_size = matrix.shape[1]
     a = np.zeros((k_number,col_size))
+    row_size = matrix.shape[0]
+    for i in range(row_size):
+        matrix[i] = matrix[i] / np.sum(matrix[i])
+
     for i in range(k_number):
         a[i] = np.random.randn(1,col_size)
 
