@@ -19,13 +19,13 @@ def lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts):
     # b = np.random.uniform(0, opts['w'])
     test_lsh_index = LSH.lsh_bucket(user_style_matrix, opts['k_number'], opts['w'], opts['b'])
     lsh_split = LSH.lsh_bucket_split(test_lsh_index)
-    print(lsh_split)
+    # print(lsh_split)
     # print(test_lsh_index)
     re_test_matrix = LSH.rebuild_matrix(user_rank_matrix, test_lsh_index)
     re_P = LSH.rebuild_matrix(P,test_lsh_index)
     # combin_split = LSH.combine_lsh_bucket(lsh_split, combin_number)
     split_number_lsh = LSH.split_lsh_bucket(lsh_split, opts['combin_number'], opts['split_number'])
-    print(split_number_lsh)
+    # print(split_number_lsh)
     loc = split_number_lsh.astype(np.int)
     for i in range(opts['split_number']):
         # if loc[i,1] == loc[i,2]:
@@ -63,7 +63,7 @@ def lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts):
             new_result = last_result * last_weight + this_result * this_weight
             result[0:loc_split[i - 1, 2] - loc_split[i, 1] + 1, :] = new_result
             final_matrix_temp = np.vstack((final_matrix_temp[0:loc_split[i, 1], :], result))
-        print("times:%d" % i)
+        # print("times:%d" % i)
     # print(lsh_split)
     # print(re_test_matrix)
     # print(test_lsh_index.shape[0])
