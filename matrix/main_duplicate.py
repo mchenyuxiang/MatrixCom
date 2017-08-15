@@ -17,14 +17,15 @@ if __name__ == "__main__":
     opts = {
         'k_number':10,                 # 哈希桶个数
         'w':0.0001,                          # 桶宽
-        'combin_number':2,              # 联合桶个数
+        'combin_number':3,              # 联合桶个数
         'split_number':4,               # 分块个数
         'b':np.random.uniform(0,0.0001),         # 局部敏感哈希函数中b
         'rank':20,                      # 预估的矩阵的秩
-        'alpha':0.03,                 # sgd 参数
+        'alpha':0.00001,                 # sgd 参数
         'beta':0.02,                    # sgd 参数
-        'step':300,                       # 循环计算次数
+        'step':5000,                       # 循环计算次数
         'rate':0.5,                     # 采样率
+        'tol':1e-7,
     }
 
     ## ml-100k 数据集
@@ -79,9 +80,9 @@ if __name__ == "__main__":
     # print(final_matrix)
 
     # 直接用SGD方法
-    direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,P,Q,opts)
+    # direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,P,Q,opts)
     ## 评价
     lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
-    direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
+    # direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
     print("lsh:%f\n" % lsh_test_error)
-    print("sgd:%f\n" % direct_test_error)
+    # print("sgd:%f\n" % direct_test_error)

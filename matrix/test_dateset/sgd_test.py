@@ -16,6 +16,6 @@ def sgd_test(user_rank_matrix,P,Q,opts):
     K = opts['rank']
     # P = np.random.rand(N, K)
     # Q = np.random.rand(M, K)
-    nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K,opts['step'],opts['alpha'],opts['beta'])
+    nP, nQ = SGD.SGD(user_rank_matrix, P, Q, K,opts['step'],opts['alpha'],opts['beta'],opts['tol'])
     direct_sgd_mc = np.dot(nP, nQ.T)
     return direct_sgd_mc

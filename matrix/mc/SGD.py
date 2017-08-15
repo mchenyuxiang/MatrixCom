@@ -4,9 +4,9 @@ import numpy
 from numba import jit
 
 @jit
-def SGD(R, P, Q, K, steps=100, alpha=0.0002, beta=0.02):
+def SGD(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02,tol=1e-7):
     Q = Q.T
-    e_old = 100
+    # e_old = 10000000
     for step in range(steps):
         for i in range(len(R)):
             for j in range(len(R[i])):
@@ -15,7 +15,7 @@ def SGD(R, P, Q, K, steps=100, alpha=0.0002, beta=0.02):
                     for k in range(K):
                         P[i][k] = P[i][k] + alpha * (2 * eij * Q[k][j] - beta * P[i][k])
                         Q[k][j] = Q[k][j] + alpha * (2 * eij * P[i][k] - beta * Q[k][j])
-        eR = numpy.dot(P,Q)
+        # eR = numpy.dot(P,Q)
         e = 0
         for i in range(len(R)):
             for j in range(len(R[i])):
@@ -23,13 +23,15 @@ def SGD(R, P, Q, K, steps=100, alpha=0.0002, beta=0.02):
                     e = e + pow(R[i][j] - numpy.dot(P[i,:],Q[:,j]), 2)
                     for k in range(K):
                         e = e + (beta/2) * ( pow(P[i][k],2) + pow(Q[k][j],2) )
-        if e < 0.001:
+        # if step == 0:
+        #     e_old = e + 1
+        if e < tol:
             break
-        if numpy.abs(e-e_old) < 0.001:
-            break
-        if (e_old - e) > 0:
-            break
-        e_old = e
+        # if numpy.abs(e-e_old) < tol:
+        #     break
+        # if (e-e_old) > 0:
+        #     break
+        # e_old = e
     return P, Q.T
 
 if __name__ == "__main__":
@@ -53,3 +55,5 @@ if __name__ == "__main__":
     nP, nQ = SGD(R, P, Q, K)
     
     result = numpy.dot(nP,nQ.T)
+
+    print(result)
