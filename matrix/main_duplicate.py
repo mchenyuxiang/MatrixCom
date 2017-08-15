@@ -14,19 +14,19 @@ import matrix.sample.line_sample as line_sample
 
 if __name__ == "__main__":
     # 参数设定
-    opts = {
-        'k_number':10,                 # 哈希桶个数
-        'w':0.0001,                          # 桶宽
-        'combin_number':3,              # 联合桶个数
-        'split_number':4,               # 分块个数
-        'b':np.random.uniform(0,0.0001),         # 局部敏感哈希函数中b
-        'rank':20,                      # 预估的矩阵的秩
-        'alpha':0.00001,                 # sgd 参数
-        'beta':0.02,                    # sgd 参数
-        'step':5000,                       # 循环计算次数
-        'rate':0.5,                     # 采样率
-        'tol':1e-7,
-    }
+    k_number = 10
+    w = 0.0001
+    combin_number = 3
+    split_number = 4
+    b = np.random.uniform(0,w)
+    rank = 20
+    aplha = 0.002
+    beta = 0.02
+    step = 2500
+    rate = 0.5
+    tol = 1e-7
+
+
 
     ## ml-100k 数据集
     # user_test_rank_matrix:    测试矩阵
@@ -49,40 +49,54 @@ if __name__ == "__main__":
     user_sample_squence = line_sample.line_sample_squence(user_ori_matrix) # 生成采样序列
     print("================end sample squence==============")
     # print(b)
-    user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, opts['rate']) # 生成训练矩阵
+    user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, rate) # 生成训练矩阵
     print("================end sample==============")
     user_style_matrix = user_rank_matrix
     user_test_rank_matrix = user_ori_matrix - user_rank_matrix # 生成验证结果矩阵
     # print(c)
 
+    result_lsh_matrix = np.zeros((len(range(5,21))+1,len(np.arange(0.0005,0.002,0.0001))+1))
+    result_sgd_matrix = np.zeros((len(range(5,21))+1,len(np.arange(0.0005,0.002,0.0001))+1))
+    i = 0
+    for rank in range(5,21):
+        j = 0
+        for aplha in np.arange(0.0005,0.0021,0.0001):
+            opts = {
+                'k_number': k_number,  # 哈希桶个数
+                'w': w,  # 桶宽
+                'combin_number': combin_number,  # 联合桶个数
+                'split_number': split_number,  # 分块个数
+                'b': b,  # 局部敏感哈希函数中b
+                'rank': rank,  # 预估的矩阵的秩
+                'alpha': aplha,  # sgd 参数
+                'beta': beta,  # sgd 参数
+                'step': step,  # 循环计算次数
+                'rate': rate,  # 采样率
+                'tol': tol,
+            }
+            # 生成sgd的因子矩阵
+            N = len(user_rank_matrix)
+            M = len(user_rank_matrix[0])
+            K = opts['rank']
+            P = np.random.rand(N, K)
+            Q = np.random.rand(M, K)
 
-    # 生成sgd的因子矩阵
-    N = len(user_rank_matrix)
-    M = len(user_rank_matrix[0])
-    K = opts['rank']
-    P = np.random.rand(N, K)
-    Q = np.random.rand(M, K)
 
-    ## 测试数据集
-    # test_a = np.random.rand(1000,opts['rank'])
-    # test_b = np.random.rand(800,opts['rank'])
-    # user_ori_matrix = test_a.dot(test_b.T)
-    # user_sample_squence = line_sample.line_sample_squence(user_ori_matrix) # 生成采样序列
-    # print("================end sample squence==============")
-    # # print(b)
-    # user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, opts['rate']) # 生成训练矩阵
-    # print("================end sample==============")
-    # user_style_matrix = user_rank_matrix
-    # user_test_rank_matrix = user_ori_matrix - user_rank_matrix # 生成验证结果矩阵
+            ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
+            final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts)
+            # print(final_matrix)
 
-    ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
-    final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts)
-    # print(final_matrix)
-
-    # 直接用SGD方法
-    # direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,P,Q,opts)
-    ## 评价
-    lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
-    # direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
-    print("lsh:%f\n" % lsh_test_error)
-    # print("sgd:%f\n" % direct_test_error)
+            # 直接用SGD方法
+            direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,P,Q,opts)
+            ## 评价
+            lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
+            direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
+            result_lsh_matrix[i,j] = lsh_test_error
+            result_sgd_matrix[i,j] = direct_test_error
+            j = j + 1
+        i = i + 1
+        print("已经完成%d\n", rank)
+            # print("lsh:%f\n" % lsh_test_error)
+            # print("sgd:%f\n" % direct_test_error)
+    np.save('dataset/result/rank_alpha_lsh.npy',result_lsh_matrix)
+    np.save('dataset/result/rank_alpha_sgd.npy', direct_test_error)
