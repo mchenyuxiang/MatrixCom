@@ -53,8 +53,8 @@ def lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts):
             this_distance = distance_split_matrix[:, 1] - this_center
             last_result = final_matrix_temp[loc_split[i, 1]:(loc_split[i - 1, 2] + 1), :]  # 上一轮计算出的结果
             this_result = result[0:loc_split[i - 1, 2] - loc_split[i, 1] + 1, :]  # 本轮计算结果
-            last_weight_temp = (last_distance / (last_distance + this_distance))
-            this_weight_temp = (this_distance / (last_distance + this_distance))
+            last_weight_temp = ((1/last_distance) / (1/last_distance + 1/this_distance))
+            this_weight_temp = ((1/this_distance) / (1/last_distance + 1/this_distance))
             last_weight = np.ones(last_result.shape)
             this_weight = np.ones(this_result.shape)
             for j in range(len(last_weight_temp)):
