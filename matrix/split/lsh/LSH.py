@@ -36,6 +36,36 @@ def lsh_bucket(matrix,k_number,w,b):
     lsh_index = lsh_index[lsh_index_arg]
     return lsh_index
 
+def lsh_new_bucket(matrix,k_number):
+    col_size = matrix.shape[1]
+    a = np.zeros((k_number,col_size))
+    row_size = matrix.shape[0]
+
+    ## 对原始矩阵进行归一
+    for i in range(row_size):
+        matrix[i] = matrix[i] / np.sum(matrix[i])
+
+    ## 生成hash函数组
+    for i in range(k_number):
+        a[i] = np.random.randn(1,col_size)
+
+    lsh_index = np.zeros((matrix.shape[0],3))
+    for i in range(matrix.shape[0]):
+        temp_sum = 0
+        temp_sum_ori = 0
+        for j in range(k_number):
+            temp_sum = temp_sum +  np.dot(matrix[i],a[j])
+            temp_sum_ori = temp_sum_ori + temp_sum
+        temp_sum = int((temp_sum / k_number))
+        temp_sum_ori = (temp_sum_ori / k_number)
+        lsh_index[i,0] = temp_sum
+        lsh_index[i,1] = temp_sum_ori
+        lsh_index[i,2] = i
+
+    lsh_index_arg = np.argsort(lsh_index[:,1]) #按照桶号从小到大排序
+    lsh_index = lsh_index[lsh_index_arg]
+    return lsh_index
+
 ## 重建矩阵
 def rebuild_matrix(matrix,lsh_index):
     row_index = matrix.shape[0]
@@ -45,6 +75,50 @@ def rebuild_matrix(matrix,lsh_index):
 
     re_matrix = matrix[loc]
     return re_matrix
+
+## 根据半径来进行矩阵划分
+def lsh_bucket_direct_split(lsh_index,split_number = 2,ratio=1):
+    lsh_matrix_split = np.zeros((split_number,4))
+    row_number = len(lsh_index)
+    max_index = np.max(lsh_index[:,1])
+    min_index = np.min(lsh_index[:,1])
+    distance = max_index - min_index
+    for i in range(split_number):
+        middle_bucket = (2*lsh_index[0,1] + (distance/split_number)*(i+1) + (distance/split_number)*i)/2
+        end_flag_temp = middle_bucket - (lsh_index[0,1] + (distance/split_number)*i)
+        end_flag = end_flag_temp*ratio
+        if i == 0:
+            lsh_matrix_split[0,0] = min_index
+            lsh_matrix_split[i,1] = middle_bucket + end_flag
+        elif i == split_number - 1:
+            lsh_matrix_split[i,0] = middle_bucket - end_flag
+            lsh_matrix_split[i,1] = max_index
+        else:
+            lsh_matrix_split[i,0] = middle_bucket - end_flag
+            lsh_matrix_split[i,1] = middle_bucket + end_flag
+
+    for i in range(split_number):
+        lsh_matrix_split[i, 2] = -1
+        for j in range(row_number):
+            if lsh_index[j,1] >= lsh_matrix_split[i,0] and lsh_index[j,1] <= lsh_matrix_split[i,1]:
+                if lsh_matrix_split[i,2] == -1:
+                    lsh_matrix_split[i,2] = j
+                if lsh_matrix_split[i,2] >= j:
+                    lsh_matrix_split[i,2] = j
+                if lsh_matrix_split[i,3] <= j:
+                    lsh_matrix_split[i,3] = j
+
+    # for i in range(row_number):
+    #     if i != 0 and lsh_index[i,1] >= lsh_matrix_split[s_i,0] and lsh_matrix_split[s_i,2] == 0 :
+    #         lsh_matrix_split[s_i, 2] = i
+    #     if lsh_index[i,1] > lsh_matrix_split[s_i,1]:
+    #         s_i = s_i + 1
+    #     if s_i == 0:
+    #         lsh_matrix_split[s_i,2]=0
+    #     lsh_matrix_split[s_i,3]=i
+
+    return lsh_matrix_split
+
 
 ## 根据lsh哈希桶的情况，将矩阵切片
 def lsh_bucket_split(lsh_index):
