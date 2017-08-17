@@ -18,15 +18,14 @@ if __name__ == "__main__":
     w = 0.0001
     combin_number = 2
     split_number = 3
-    b = np.random.uniform(0,w)
+    b = np.random.uniform(0, w)
     rank = 20
     aplha = 0.0008
     beta = 0.02
     step = 1500
     rate = 0.5
     tol = 1e-7
-
-
+    ratio = 1.1
 
     ## ml-100k 数据集
     # user_test_rank_matrix:    测试矩阵
@@ -43,16 +42,16 @@ if __name__ == "__main__":
     save_url = 'dataset/gant'
     extra_name = 'GeantMatrixODNorm'
     # io_file.save_mat(file_url,save_url,extra_name) # 将mat文件保存为npy文件
-    save_url_name = save_url+"/"+extra_name+".npy"
-    user_ori_matrix = np.load(save_url_name) # 原始矩阵
+    save_url_name = save_url + "/" + extra_name + ".npy"
+    user_ori_matrix = np.load(save_url_name)  # 原始矩阵
     print("================end load file==============")
-    user_sample_squence = line_sample.line_sample_squence(user_ori_matrix) # 生成采样序列
+    user_sample_squence = line_sample.line_sample_squence(user_ori_matrix)  # 生成采样序列
     print("================end sample squence==============")
     # print(b)
-    user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, rate) # 生成训练矩阵
+    user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, rate)  # 生成训练矩阵
     print("================end sample==============")
     user_style_matrix = user_rank_matrix
-    user_test_rank_matrix = user_ori_matrix - user_rank_matrix # 生成验证结果矩阵
+    user_test_rank_matrix = user_ori_matrix - user_rank_matrix  # 生成验证结果矩阵
     # print(c)
 
     opts = {
@@ -60,13 +59,14 @@ if __name__ == "__main__":
         'w': w,  # 桶宽
         'combin_number': combin_number,  # 联合桶个数
         'split_number': split_number,  # 分块个数
-    'b': b,  # 局部敏感哈希函数中b
-    'rank': rank,  # 预估的矩阵的秩
-    'alpha': aplha,  # sgd 参数
-    'beta': beta,  # sgd 参数
-    'step': step,  # 循环计算次数
-    'rate': rate,  # 采样率
-    'tol': tol,
+        'b': b,  # 局部敏感哈希函数中b
+        'rank': rank,  # 预估的矩阵的秩
+        'alpha': aplha,  # sgd 参数
+        'beta': beta,  # sgd 参数
+        'step': step,  # 循环计算次数
+        'rate': rate,  # 采样率
+        'tol': tol,
+        'ratio':ratio, # 半径改变
     }
     # 生成sgd的因子矩阵
     N = len(user_rank_matrix)
@@ -75,13 +75,12 @@ if __name__ == "__main__":
     P = np.random.rand(N, K)
     Q = np.random.rand(M, K)
 
-
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
-    final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts)
+    final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)
     # print(final_matrix)
 
     # 直接用SGD方法
-    direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix,P,Q,opts)
+    direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
     ## 评价
     lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
     direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
