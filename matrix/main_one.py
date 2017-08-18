@@ -7,6 +7,7 @@ Created on Sat Jul 15 01:10:35 2017
 import numpy as np
 import matrix.evaluate.Evaluate as EVA
 import matrix.method.lsh_duplicate_mc as lsh_duplicate_mc
+import matrix.method.lsh_duplicate_row_col_mc as lsh_duplicate_row_col_mc
 import matrix.test_dateset.ml100k as ml100k
 import matrix.test_dateset.sgd_test as sgd_test
 import matrix.util.io_file as io_file
@@ -20,9 +21,9 @@ if __name__ == "__main__":
     split_number = 3
     b = np.random.uniform(0, w)
     rank = 20
-    aplha = 0.0008
+    aplha = 0.01
     beta = 0.02
-    step = 1500
+    step = 300
     rate = 0.5
     tol = 1e-7
     ratio = 1.1
@@ -76,14 +77,14 @@ if __name__ == "__main__":
     Q = np.random.rand(M, K)
 
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
-    final_matrix = lsh_duplicate_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)
+    final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)
     # print(final_matrix)
 
     # 直接用SGD方法
     direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
     ## 评价
-    lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
+    # lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
     direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
     # print("已经完成%d\n", rank)
-    print("lsh:%f\n" % lsh_test_error)
+    # print("lsh:%f\n" % lsh_test_error)
     print("sgd:%f\n" % direct_test_error)

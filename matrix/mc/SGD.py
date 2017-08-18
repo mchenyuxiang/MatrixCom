@@ -27,6 +27,7 @@ def SGD(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02,tol=1e-7):
         #     e_old = e + 1
         if e < tol:
             break
+        print(e)
         # if numpy.abs(e-e_old) < tol:
         #     break
         # if (e-e_old) > 0:
