@@ -19,11 +19,12 @@ if __name__ == "__main__":
     w = 0.0001
     combin_number = 2
     split_number = 3
+    split_col_number = 2
     b = np.random.uniform(0, w)
     rank = 20
     aplha = 0.01
     beta = 0.02
-    step = 300
+    step = 1
     rate = 0.5
     tol = 1e-7
     ratio = 1.1
@@ -39,9 +40,10 @@ if __name__ == "__main__":
     # user_test_rank_matrix, user_rank_matrix, item_style_matrix, user_style_matrix = ml100k.test_ml100k(file_url,item_url,test_url)
 
     ## geant 数据集
-    file_url = 'dataset/gant/GeantOD.mat'
+    # file_url = 'dataset/gant/GeantOD.mat'
     save_url = 'dataset/gant'
     extra_name = 'GeantMatrixODNorm'
+    # extra_name = 'GeantMatrixOD'
     # io_file.save_mat(file_url,save_url,extra_name) # 将mat文件保存为npy文件
     save_url_name = save_url + "/" + extra_name + ".npy"
     user_ori_matrix = np.load(save_url_name)  # 原始矩阵
@@ -59,7 +61,8 @@ if __name__ == "__main__":
         'k_number': k_number,  # 哈希桶个数
         'w': w,  # 桶宽
         'combin_number': combin_number,  # 联合桶个数
-        'split_number': split_number,  # 分块个数
+        'split_number': split_number,  # 行分块个数
+        'split_col_number': split_col_number, # 列分块个数
         'b': b,  # 局部敏感哈希函数中b
         'rank': rank,  # 预估的矩阵的秩
         'alpha': aplha,  # sgd 参数
@@ -77,14 +80,15 @@ if __name__ == "__main__":
     Q = np.random.rand(M, K)
 
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
-    final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)
+    # final_matrix = lsh_duplicate_row_col_mc.row_mc(user_rank_matrix, user_style_matrix, P, Q, opts) # 对行进行计算
+    final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts) # 对行列进行分块
     # print(final_matrix)
 
     # 直接用SGD方法
     direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
     ## 评价
-    # lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
+    lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
     direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
     # print("已经完成%d\n", rank)
-    # print("lsh:%f\n" % lsh_test_error)
+    print("lsh:%f\n" % lsh_test_error)
     print("sgd:%f\n" % direct_test_error)

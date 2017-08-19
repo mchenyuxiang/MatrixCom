@@ -26,7 +26,7 @@ def test_error(computer_matrix,test_matrix):
 
 if __name__ == "__main__":
     test_matrix = np.array([(2,0,3,0),(0,4,0,4)])
-    computer_matrix = np.array([(3,0,3,0),(0,4,0,4)])
+    computer_matrix = np.array([(3,1,3,1),(0,3,0,4)])
     fro = test_error(computer_matrix,test_matrix)
     print(fro)
     pass
