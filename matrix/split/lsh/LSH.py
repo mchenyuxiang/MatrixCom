@@ -41,9 +41,13 @@ def lsh_new_bucket(matrix,k_number):
     a = np.zeros((k_number,col_size))
     row_size = matrix.shape[0]
 
+    matrix_ori = matrix
     ## 对原始矩阵进行归一
     for i in range(row_size):
-        matrix[i] = matrix[i] / np.sum(matrix[i])
+        matrix_sum = np.sum(matrix_ori[i])
+        if matrix_sum == 0:
+            continue
+        matrix[i] = matrix_ori[i] / matrix_sum
 
     ## 生成hash函数组
     for i in range(k_number):
@@ -56,6 +60,7 @@ def lsh_new_bucket(matrix,k_number):
         for j in range(k_number):
             temp_sum = temp_sum +  np.dot(matrix[i],a[j])
             temp_sum_ori = temp_sum_ori + temp_sum
+        # print(i,j,temp_sum)
         temp_sum = int((temp_sum / k_number))
         temp_sum_ori = (temp_sum_ori / k_number)
         lsh_index[i,0] = temp_sum
