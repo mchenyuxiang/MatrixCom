@@ -82,6 +82,7 @@ def rebuild_matrix(matrix,lsh_index):
     return re_matrix
 
 ## 根据半径来进行矩阵划分
+## lsh_index 中，第一列为最小坐标，第二列为最大坐标
 def lsh_bucket_direct_split(lsh_index,split_number = 2,ratio=1):
     lsh_matrix_split = np.zeros((split_number,4))
     row_number = len(lsh_index)

@@ -19,12 +19,12 @@ if __name__ == "__main__":
     w = 0.0001
     combin_number = 2
     split_number = 3
-    split_col_number = 2
+    split_col_number = 3
     b = np.random.uniform(0, w)
     rank = 20
-    aplha = 0.01
+    aplha = 0.025
     beta = 0.02
-    step = 1
+    step = 200
     rate = 0.5
     tol = 1e-7
     ratio = 1.1
@@ -43,9 +43,11 @@ if __name__ == "__main__":
     # file_url = 'dataset/gant/GeantOD.mat'
     save_url = 'dataset/gant'
     extra_name = 'GeantMatrixODNorm'
+    # extra_name = 'dataset/result/rank_alpha_lsh'
     # extra_name = 'GeantMatrixOD'
     # io_file.save_mat(file_url,save_url,extra_name) # 将mat文件保存为npy文件
     save_url_name = save_url + "/" + extra_name + ".npy"
+    # save_url_name = extra_name + ".npy"
     user_ori_matrix = np.load(save_url_name)  # 原始矩阵
     print("================end load file==============")
     user_sample_squence = line_sample.line_sample_squence(user_ori_matrix)  # 生成采样序列
