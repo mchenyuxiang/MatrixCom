@@ -47,7 +47,7 @@ def lsh_new_bucket(matrix,k_number):
         matrix_sum = np.sum(matrix_ori[i])
         if matrix_sum == 0:
             continue
-        matrix[i] = matrix_ori[i] / matrix_sum
+            matrix_ori[i] = matrix_ori[i] / matrix_sum
 
     ## 生成hash函数组
     for i in range(k_number):

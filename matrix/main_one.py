@@ -27,7 +27,7 @@ if __name__ == "__main__":
     step = 200
     rate = 0.5
     tol = 1e-7
-    ratio = 1.1
+    ratio = 1
 
     ## ml-100k 数据集
     # user_test_rank_matrix:    测试矩阵
