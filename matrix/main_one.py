@@ -18,16 +18,16 @@ if __name__ == "__main__":
     k_number = 10
     w = 0.0001
     combin_number = 2
-    split_number = 3
-    split_col_number = 3
+    split_number = 2
+    split_col_number = 2
     b = np.random.uniform(0, w)
-    rank = 20
-    aplha = 0.025
+    rank = 2
+    aplha = 0.0025
     beta = 0.02
-    step = 200
-    rate = 0.5
+    step = 10
+    rate = 0.8
     tol = 1e-7
-    ratio = 1
+    ratio = 1.1
 
     ## ml-100k 数据集
     # user_test_rank_matrix:    测试矩阵
@@ -40,16 +40,41 @@ if __name__ == "__main__":
     # user_test_rank_matrix, user_rank_matrix, item_style_matrix, user_style_matrix = ml100k.test_ml100k(file_url,item_url,test_url)
 
     ## geant 数据集
-    # file_url = 'dataset/gant/GeantOD.mat'
+    file_url = 'dataset/gant/GeantOD.mat'
     save_url = 'dataset/gant'
     extra_name = 'GeantMatrixODNorm'
+    # extra_name = 'GeantMatrixOD'
+    save_url_name = save_url + "/" + extra_name + ".npy"
+    user_ori_matrix = np.load(save_url_name)[:,0:528].T  # 原始矩阵
+
+
     # extra_name = 'dataset/result/rank_alpha_lsh'
     # extra_name = 'GeantMatrixOD'
     # io_file.save_mat(file_url,save_url,extra_name) # 将mat文件保存为npy文件
-    save_url_name = save_url + "/" + extra_name + ".npy"
     # save_url_name = extra_name + ".npy"
-    user_ori_matrix = np.load(save_url_name)  # 原始矩阵
+    flag = 1
+    while flag==1:
+        for i in range(len(user_ori_matrix)):
+            if np.sum(user_ori_matrix[i]) == 0:
+                user_ori_matrix = np.delete(user_ori_matrix,i,0)
+                break
+        if i == len(user_ori_matrix)-1:
+            flag = 0
+
+    # user_ori_matrix = user_ori_matrix/10000000
+    # print("==============")
+
     print("================end load file==============")
+    # R = [
+    #     [5, 3, 4, 1, 2, 1],
+    #     [4, 2, 3, 1, 2, 3],
+    #     [1, 1, 5, 5, 2, 5],
+    #     [1, 1, 4, 4, 2, 4],
+    #     [2, 1, 5, 4, 2, 4],
+    #     [1, 1, 5, 5, 2, 5],
+    #     [3, 1, 5, 4, 2, 4],
+    # ]
+    # user_ori_matrix = np.array(R)
     user_sample_squence = line_sample.line_sample_squence(user_ori_matrix)  # 生成采样序列
     print("================end sample squence==============")
     # print(b)
@@ -64,7 +89,7 @@ if __name__ == "__main__":
         'w': w,  # 桶宽
         'combin_number': combin_number,  # 联合桶个数
         'split_number': split_number,  # 行分块个数
-        'split_col_number': split_col_number, # 列分块个数
+        'split_col_number': split_col_number,  # 列分块个数
         'b': b,  # 局部敏感哈希函数中b
         'rank': rank,  # 预估的矩阵的秩
         'alpha': aplha,  # sgd 参数
@@ -72,18 +97,20 @@ if __name__ == "__main__":
         'step': step,  # 循环计算次数
         'rate': rate,  # 采样率
         'tol': tol,
-        'ratio':ratio, # 半径改变
+        'ratio': ratio,  # 半径改变
     }
     # 生成sgd的因子矩阵
     N = len(user_rank_matrix)
     M = len(user_rank_matrix[0])
     K = opts['rank']
     P = np.random.rand(N, K)
+    P = np.double(P)
     Q = np.random.rand(M, K)
+    Q = np.double(Q)
 
     ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
     # final_matrix = lsh_duplicate_row_col_mc.row_mc(user_rank_matrix, user_style_matrix, P, Q, opts) # 对行进行计算
-    final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts) # 对行列进行分块
+    final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)  # 对行列进行分块
     # print(final_matrix)
 
     # 直接用SGD方法

@@ -55,10 +55,10 @@ def lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts):
     result_map = dict()
     for i in range(opts['split_number']):
         for j in range(opts['split_col_number']):
-            R = re_test_matrix[loc[i,2]:(loc[i,3]+1),loc_col[j,2]:(loc[j,3]+1)]
+            R = re_test_matrix[loc[i,2]:(loc[i,3]+1),loc_col[j,2]:(loc_col[j,3]+1)]
             K = opts['rank']
             P_lsh = re_P[loc[i,2]:(loc[i,3]+1),:]
-            Q_lsh = re_Q[loc_col[j,2]:(loc[j,3]+1),:]
+            Q_lsh = re_Q[loc_col[j,2]:(loc_col[j,3]+1),:]
             nP,nQ = SGD.SGD(R, P_lsh,Q_lsh,K,opts['step'],opts['alpha'],opts['beta'],opts['tol'])
             result = np.dot(nP,nQ.T)
             result_map[str(i)+''+str(j)] = result
@@ -133,7 +133,7 @@ def lsh_mc(user_rank_matrix,user_style_matrix,P,Q,opts):
                 else:
                     weight_1 = (1/distance_row[0,0])/(1/distance_row[0,0]+1/distance_row[0,1]+1/distance_row[0,2]+1/distance_row[0,3])
                     weight_2 = (1/distance_row[0,1])/(1/distance_row[0,0]+1/distance_row[0,1]+1/distance_row[0,2]+1/distance_row[0,3])
-                print((j-loc[i,2]),(k-loc_col[col_split_number,2]))
+                # print((j-loc[i,2]),(k-loc_col[col_split_number,2]))
                 block_matrix_1[(j-loc[i,2]),(k-loc_col[col_split_number,2])] = weight_1 * block_matrix_1[(j-loc[i,2]),(k-loc_col[col_split_number,2])]
                 block_matrix_2[(j-loc[i+1,2]),(k-loc_col[col_split_number,2])] = weight_2 * block_matrix_2[(j-loc[i+1,2]),(k-loc_col[col_split_number,2])]
                 result_map[str(i)+''+str(col_split_number)] = block_matrix_1

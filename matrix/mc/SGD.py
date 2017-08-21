@@ -6,7 +6,10 @@ from numba import jit
 @jit
 def SGD(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02,tol=1e-7):
     Q = Q.T
+    P = numpy.float64(P)
+    Q = numpy.float64(Q)
     # e_old = 10000000
+    numpy.seterr(all='print')
     for step in range(steps):
         for i in range(len(R)):
             for j in range(len(R[i])):
@@ -36,13 +39,16 @@ def SGD(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02,tol=1e-7):
     return P, Q.T
 
 if __name__ == "__main__":
+    # R = [
+    #      [5,3,0,1],
+    #      [4,0,0,1],
+    #      [1,1,0,5],
+    #      [1,0,0,4],
+    #      [0,1,5,4],
+    #     ]
     R = [
-         [5,3,0,1],
-         [4,0,0,1],
-         [1,1,0,5],
-         [1,0,0,4],
-         [0,1,5,4],
-        ]
+        [5, 3, 0, 1]
+    ]
 
     R = numpy.array(R)
 
