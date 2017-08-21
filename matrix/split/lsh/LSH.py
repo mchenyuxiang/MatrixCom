@@ -47,7 +47,7 @@ def lsh_new_bucket(matrix,k_number):
         matrix_sum = np.sum(matrix_ori[i])
         if matrix_sum == 0:
             continue
-            matrix_ori[i] = matrix_ori[i] / matrix_sum
+        matrix_ori[i] = matrix_ori[i] / matrix_sum
 
     ## 生成hash函数组
     for i in range(k_number):
@@ -58,7 +58,7 @@ def lsh_new_bucket(matrix,k_number):
         temp_sum = 0
         temp_sum_ori = 0
         for j in range(k_number):
-            temp_sum = temp_sum +  np.dot(matrix[i],a[j])
+            temp_sum = temp_sum +  np.dot(matrix_ori[i],a[j])
             temp_sum_ori = temp_sum_ori + temp_sum
         # print(i,j,temp_sum)
         temp_sum = int((temp_sum / k_number))
@@ -89,9 +89,10 @@ def lsh_bucket_direct_split(lsh_index,split_number = 2,ratio=1):
     max_index = np.max(lsh_index[:,1])
     min_index = np.min(lsh_index[:,1])
     distance = max_index - min_index
+    block = distance/split_number
     for i in range(split_number):
-        middle_bucket = (2*lsh_index[0,1] + (distance/split_number)*(i+1) + (distance/split_number)*i)/2
-        end_flag_temp = middle_bucket - (lsh_index[0,1] + (distance/split_number)*i)
+        middle_bucket = (2*lsh_index[0,1] + block*(i+1) + block*i)/2
+        end_flag_temp = middle_bucket - (lsh_index[0,1] + block*i)
         end_flag = end_flag_temp*ratio
         if i == 0:
             lsh_matrix_split[0,0] = min_index
@@ -212,12 +213,12 @@ if __name__ ==  "__main__":
     k_number = 10
     w = 1
     b = np.random.uniform(0,w)
-    test_lsh_index = lsh_bucket(test_matrix,k_number,w,b)
+    test_lsh_index = lsh_new_bucket(test_matrix,k_number)
     print(test_lsh_index)
     re_test_matrix = rebuild_matrix(test_matrix,test_lsh_index)
     print(re_test_matrix)
     # print(test_lsh_index.shape[0])
-    lsh_split = lsh_bucket_split(test_lsh_index)
+    lsh_split = lsh_bucket_direct_split(test_lsh_index,split_number=2,ratio=1)
     print(lsh_split)
     final_matrix = restore_matrix(re_test_matrix,test_lsh_index)
     print(final_matrix)
