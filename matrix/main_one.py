@@ -21,10 +21,10 @@ if __name__ == "__main__":
     split_number = 2
     split_col_number = 2
     b = np.random.uniform(0, w)
-    rank = 2
+    rank = 30
     aplha = 0.0025
     beta = 0.02
-    step = 10
+    step = 300
     rate = 0.8
     tol = 1e-7
     ratio = 1.1
