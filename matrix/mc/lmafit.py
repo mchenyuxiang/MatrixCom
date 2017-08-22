@@ -50,7 +50,9 @@ def lmafit_mc_adp(m,n,k,Known,data,opts):
         m = n
         n = tmp
         Z = Z.T
-        Known = np.nonzero(Z)
+        Known = np.array(Z)
+        Known[Known > 0] = 1
+        Known = Known.astype(int)
         data = Z[Known]
         data_tran = True
 

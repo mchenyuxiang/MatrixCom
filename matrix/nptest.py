@@ -6,7 +6,7 @@ Created on Sat Jul 15 00:15:34 2017
 """
 
 import numpy as np
-import lmafit as lmafit
+import matrix.mc.lmafit as lmafit
 
 a = np.arange(15).reshape(3,5)
 
