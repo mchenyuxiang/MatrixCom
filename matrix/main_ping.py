@@ -10,6 +10,7 @@ import matrix.method.lsh_duplicate_row_col_mc as lsh_duplicate_row_col_mc
 import matrix.test_dateset.sgd_test as sgd_test
 import matrix.sample.line_sample as line_sample
 import matrix.mc.lmafit as lmafit
+import datetime
 
 if __name__ == "__main__":
     # 参数设定
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     beta = 0.02
     step_lsh = 400
     step_sgd = 1000
-    rate = 0.5
+    rate = 0.8
     tol = 1e-7
     ratio = 1.5
 
@@ -82,60 +83,67 @@ if __name__ == "__main__":
     user_sample_squence = line_sample.line_sample_squence(user_ori_matrix)  # 生成采样序列
     print("================end sample squence==============")
 
-    # 参数
-    opts = {
-        'k_number': k_number,  # 哈希桶个数
-        'w': w,  # 桶宽
-        'combin_number': combin_number,  # 联合桶个数
-        'split_number': split_number,  # 行分块个数
-        'split_col_number': split_col_number,  # 列分块个数
-        'b': b,  # 局部敏感哈希函数中b
-        'rank': rank,  # 预估的矩阵的秩
-        'alpha': aplha,  # sgd 参数
-        'beta': beta,  # sgd 参数
-        'step': step_lsh,  # 循环计算次数
-        'step_sgd': step_sgd,  # sgd循环次数
-        'rate': rate,  # 采样率
-        'tol': tol,
-        'ratio': ratio,  # 半径改变
-    }
-
     # print(b)
-    user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, opts['rate'])  # 生成训练矩阵
+    user_rank_matrix = line_sample.line_sample_matrix(user_ori_matrix, user_sample_squence, rate)  # 生成训练矩阵
     print("================end sample==============")
     user_style_matrix = user_rank_matrix
     user_test_rank_matrix = user_ori_matrix - user_rank_matrix  # 生成验证结果矩阵
     # print(c)
 
+    result_lsh_matrix = np.zeros(len(np.arange(0.00001,0.001,0.00001)) + 1)
+    i = 0
+    for aplha in np.arange(0.00001,0.001,0.00001):
+        starttime = datetime.datetime.now()
+        # 参数
+        opts = {
+            'k_number': k_number,  # 哈希桶个数
+            'w': w,  # 桶宽
+            'combin_number': combin_number,  # 联合桶个数
+            'split_number': split_number,  # 行分块个数
+            'split_col_number': split_col_number,  # 列分块个数
+            'b': b,  # 局部敏感哈希函数中b
+            'rank': rank,  # 预估的矩阵的秩
+            'alpha': aplha,  # sgd 参数
+            'beta': beta,  # sgd 参数
+            'step': step_lsh,  # 循环计算次数
+            'step_sgd': step_sgd,  # sgd循环次数
+            'rate': rate,  # 采样率
+            'tol': tol,
+            'ratio': ratio,  # 半径改变
+        }
 
-    # 生成sgd的因子矩阵
-    N = len(user_rank_matrix)
-    M = len(user_rank_matrix[0])
-    K = opts['rank']
-    P = np.random.rand(N, K)
-    P = np.double(P)
-    Q = np.random.rand(M, K)
-    Q = np.double(Q)
+        # 生成sgd的因子矩阵
+        N = len(user_rank_matrix)
+        M = len(user_rank_matrix[0])
+        K = opts['rank']
+        P = np.random.rand(N, K)
+        P = np.double(P)
+        Q = np.random.rand(M, K)
+        Q = np.double(Q)
 
-    ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
-    # final_matrix = lsh_duplicate_row_col_mc.row_mc(user_rank_matrix, user_style_matrix, P, Q, opts) # 对行进行计算
-    final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)  # 对行列进行分块
-    # print(final_matrix)
+        ## 将兴趣归一矩阵利用LSH哈希函数将矩阵分块
+        # final_matrix = lsh_duplicate_row_col_mc.row_mc(user_rank_matrix, user_style_matrix, P, Q, opts) # 对行进行计算
+        final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)  # 对行列进行分块
+        # print(final_matrix)
 
-    # 直接用SGD方法
-    direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
+        # 直接用SGD方法
+        direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
 
-    # lmafit 方法
-    # bool_idx = np.array(user_rank_matrix)
-    # bool_idx[bool_idx>0] = 1
-    # bool_idx = bool_idx.astype(int)
-    # X,Y,Out = lmafit.lmafit_mc_adp(user_rank_matrix.shape[0],user_rank_matrix.shape[1],opts['rank'],bool_idx,user_rank_matrix,1)
-    # lmafit_mc = X.dot(Y)
-    ## 评价
-    lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
-    direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
-    # lmafit_test_error = EVA.test_error(lmafit_mc,user_test_rank_matrix)
-    # print("已经完成%d\n", rank)
-    print("lsh:%f\n" % lsh_test_error)
-    print("sgd:%f\n" % direct_test_error)
-    # print("lmafit:%f\n" % lmafit_test_error)
+        # lmafit 方法
+        # bool_idx = np.array(user_rank_matrix)
+        # bool_idx[bool_idx>0] = 1
+        # bool_idx = bool_idx.astype(int)
+        # X,Y,Out = lmafit.lmafit_mc_adp(user_rank_matrix.shape[0],user_rank_matrix.shape[1],opts['rank'],bool_idx,user_rank_matrix,1)
+        # lmafit_mc = X.dot(Y)
+        ## 评价
+        lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
+        # direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
+        # lmafit_test_error = EVA.test_error(lmafit_mc,user_test_rank_matrix)
+        # print("已经完成%d\n", rank)
+        result_lsh_matrix[i] = lsh_test_error
+        endtime = (datetime.datetime.now()-starttime).microseconds
+        i = i+1
+        print(aplha,lsh_test_error,endtime)
+        # print("sgd:%f\n" % direct_test_error)
+        # print("lmafit:%f\n" % lmafit_test_error)
+    np.save('dataset/result/rank_alpha_lsh.npy', result_lsh_matrix)
