@@ -17,7 +17,7 @@ def save_mat(file_url,save_url,extra_name):
     np.save(save_name,mat_t)
 
 if __name__ == "__main__":
-    file_url = '../dataset/pings_4hr/pings_4h30min.mat'
-    save_url = '../dataset/pings_4hr'
-    extra_name = 'originMatrix4h30min'
+    file_url = '../dataset/weather/PM25.mat'
+    save_url = '../dataset/weather'
+    extra_name = 'PM_Data'
     save_mat(file_url,save_url,extra_name)

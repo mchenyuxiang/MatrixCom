@@ -16,7 +16,7 @@ if __name__ == "__main__":
     k_number = 10
     w = 0.0001
     combin_number = 2
-    split_number = 3
+    split_number = 50
     split_col_number = 1
     b = np.random.uniform(0, w)
     rank = 8

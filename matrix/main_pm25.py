@@ -50,8 +50,14 @@ if __name__ == "__main__":
     # user_ori_matrix = np.load(save_url_name)[:,0:528].T  # 原始矩阵
 
     ## pings 数据集
-    save_url = 'dataset/pings_4hr'
-    extra_name = 'originMatrix4h30min'
+    # save_url = 'dataset/pings_4hr'
+    # extra_name = 'originMatrix4h30min'
+    # save_url_name = save_url + "/" + extra_name + ".npy"
+    # user_ori_matrix = np.load(save_url_name)
+
+    ## pm25 数据集
+    save_url = 'dataset/weather'
+    extra_name = 'PM_Data'
     save_url_name = save_url + "/" + extra_name + ".npy"
     user_ori_matrix = np.load(save_url_name)
 
@@ -156,7 +162,8 @@ if __name__ == "__main__":
         endtime_lsh = (datetime.datetime.now() - starttime).microseconds / 1000 / 60
 
         # 没有重叠只是重拍
-        final_nodu_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts_no)  # 对行列进行分块
+        final_nodu_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q,
+                                                            opts_no)  # 对行列进行分块
         # 直接用SGD方法
         starttime = datetime.datetime.now()
         direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
@@ -164,7 +171,7 @@ if __name__ == "__main__":
 
         ## 随机分块方法
         starttime = datetime.datetime.now()
-        rand_split_mc = rand_split_test.split_mc(user_rank_matrix,P,Q,opts)
+        rand_split_mc = rand_split_test.split_mc(user_rank_matrix, P, Q, opts)
         endtime_rand = (datetime.datetime.now() - starttime).microseconds / 1000 / 60
         # lmafit 方法
         # bool_idx = np.array(user_rank_matrix)
@@ -176,7 +183,7 @@ if __name__ == "__main__":
         lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
         lsh_test_nodu_error = EVA.test_error(final_nodu_matrix, user_test_rank_matrix)
         direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
-        rand_test_error = EVA.test_error(rand_split_mc,user_test_rank_matrix)
+        rand_test_error = EVA.test_error(rand_split_mc, user_test_rank_matrix)
         # lmafit_test_error = EVA.test_error(lmafit_mc,user_test_rank_matrix)
         # print("已经完成%d\n", rank)
         result_lsh_rank_matrix[i] = lsh_test_error
@@ -195,10 +202,10 @@ if __name__ == "__main__":
         'result_sgd_rank_matrix': result_sgd_rank_matrix,
         'result_lsh_time_matrix': result_lsh_time_matrix,
         'result_sgd_time_matrix': result_sgd_time_matrix,
-        'result_rand_rank_matrix':result_rand_rank_matrix,
-        'result_rand_time_matrix':result_rand_time_matrix,
-        'result_lsh_nodu_rank_matrix':result_lsh_nodu_rank_matrix
+        'result_rand_rank_matrix': result_rand_rank_matrix,
+        'result_rand_time_matrix': result_rand_time_matrix,
+        'result_lsh_nodu_rank_matrix': result_lsh_nodu_rank_matrix
     }
-    np.save('dataset/result/rank_lsh_ping.npy', result_rank)
+    np.save('dataset/result/rank_lsh_pm25.npy', result_rank)
     # mat = np.load('dataset/result/rank_lsh_ping.npy')
-    io.savemat('dataset/result/rank_lsh_ping.mat', {'rank_lsh_ping': result_rank})
+    io.savemat('dataset/result/rank_lsh_pm25.mat', {'rank_lsh_pm25': result_rank})

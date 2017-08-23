@@ -20,6 +20,16 @@ def line_sample_squence(matrix):
 
     return sample_squence
 
+## 生成随机数
+def line_rand_matrix(matrix):
+    row_number = matrix.shape[0]
+    rand_squence = np.zeros((row_number,3))
+    for i in range(3):
+        rand_squence[:,i] = np.linspace(0,row_number-1,row_number)
+        np.random.shuffle(rand_squence[:,i])
+
+    return rand_squence
+
 ## 生成采样矩阵
 def line_sample_matrix(matrix,sample_squence,rate):
     row_number = matrix.shape[0]

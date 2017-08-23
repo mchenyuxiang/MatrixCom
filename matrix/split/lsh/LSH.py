@@ -76,8 +76,8 @@ def lsh_new_bucket(matrix, k_number):
 
 ## 重建矩阵
 def rebuild_matrix(matrix, lsh_index):
-    row_index = matrix.shape[0]
-    col_index = matrix.shape[1]
+    # row_index = matrix.shape[0]
+    # col_index = matrix.shape[1]
     # re_matrix = np.zeros((row_index,col_index))
     loc = lsh_index.astype(np.int)[:, 2]
 
