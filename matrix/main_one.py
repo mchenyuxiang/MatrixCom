@@ -7,6 +7,7 @@ Created on Sat Jul 15 01:10:35 2017
 import numpy as np
 import matrix.evaluate.Evaluate as EVA
 import matrix.method.lsh_duplicate_row_col_mc as lsh_duplicate_row_col_mc
+import matrix.method.lsh_duplicate_row_col_mc_weight as lsh_duplicate_row_col_mc_weight
 import matrix.test_dateset.sgd_test as sgd_test
 import matrix.sample.line_sample as line_sample
 import matrix.mc.lmafit as lmafit
@@ -16,8 +17,8 @@ if __name__ == "__main__":
     k_number = 10
     w = 0.0001
     combin_number = 2
-    split_number = 50
-    split_col_number = 1
+    split_number = 4
+    split_col_number = 2
     b = np.random.uniform(0, w)
     rank = 8
     aplha = 0.00055
@@ -122,6 +123,7 @@ if __name__ == "__main__":
     final_matrix = lsh_duplicate_row_col_mc.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)  # 对行列进行分块
     # print(final_matrix)
 
+    final_matrix_weight = lsh_duplicate_row_col_mc_weight.lsh_mc(user_rank_matrix, user_style_matrix, P, Q, opts)  # 对行列进行分块
     # 直接用SGD方法
     direct_sgd_mc = sgd_test.sgd_test(user_rank_matrix, P, Q, opts)
 
@@ -133,9 +135,11 @@ if __name__ == "__main__":
     # lmafit_mc = X.dot(Y)
     ## 评价
     lsh_test_error = EVA.test_error(final_matrix, user_test_rank_matrix)
+    lsh_test_weight = EVA.test_error(final_matrix_weight, user_test_rank_matrix)
     direct_test_error = EVA.test_error(direct_sgd_mc, user_test_rank_matrix)
     # lmafit_test_error = EVA.test_error(lmafit_mc,user_test_rank_matrix)
     # print("已经完成%d\n", rank)
     print("lsh:%f\n" % lsh_test_error)
+    print("lsh_test_weight:%f\n" % lsh_test_weight)
     print("sgd:%f\n" % direct_test_error)
     # print("lmafit:%f\n" % lmafit_test_error)
